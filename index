@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>胸揺れ判定ゲーム</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        .character-selection {
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
+        }
+        .character {
+            margin: 0 20px;
+            cursor: pointer;
+        }
+        .character img {
+            width: 200px;
+            height: 400px;
+        }
+        #gameScreen {
+            display: none;
+        }
+        #gameOverScreen {
+            display: none;
+        }
+        #gameClearScreen {
+            display: none;
+        }
+        #score {
+            font-size: 30px;
+            margin-top: 10px;
+        }
+        #dokiDokiGauge {
+            height: 20px;
+            background-color: red;
+            margin: 10px auto;
+            width: 80%;
+        }
+        .characterDetails {
+            margin-top: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="characterSelection">
+        <h2>キャラクターを選んでください</h2>
+        <div class="character-selection">
+            <div class="character" onclick="selectCharacter('Reina')">
+                <img src="reina.png" alt="霧島レイナ">
+                <p>霧島レイナ</p>
+            </div>
+            <div class="character" onclick="selectCharacter('Hinata')">
+                <img src="hinata.png" alt="橘ひなた">
+                <p>橘ひなた</p>
+            </div>
+            <div class="character" onclick="selectCharacter('Luna')">
+                <img src="luna.png" alt="水無月ルナ">
+                <p>水無月ルナ</p>
+            </div>
+        </div>
+        <div id="characterDetails" class="characterDetails hidden">
+            <p id="characterInfo"></p>
+        </div>
+    </div>
+
+    <div id="gameScreen">
+        <h2>ゲームスタート</h2>
+        <div id="score">スコア: 0</div>
+        <div id="dokiDokiGauge"></div>
+        <img id="characterImage" src="" alt="Character" style="width: 300px;">
+    </div>
+
+    <div id="gameOverScreen">
+        <h2>ゲームオーバー！</h2>
+        <p id="finalScore"></p>
+        <button onclick="restartGame()">もう一度プレイ</button>
+    </div>
+
+    <div id="gameClearScreen">
+        <h2>ゲームクリア！</h2>
+        <p>ドキドキMAX！</p>
+        <button onclick="restartGame()">もう一度プレイ</button>
+    </div>
+
+    <script>
+        let selectedCharacter = null;
+        let score = 0;
+        let shakeAmount = 0;
+        let dokiDokiGauge = 0;
+        let shakeThreshold = 12;
+        let shakeStrength = 0;
+
+        const characters = {
+            Reina: { name: '霧島レイナ', image: 'reina.png', description: 'ツンデレお嬢様、Eカップ', shakeMultiplier: 1 },
+            Hinata: { name: '橘ひなた', image: 'hinata.png', description: '甘えん坊ギャル、Gカップ', shakeMultiplier: 1.5 },
+            Luna: { name: '水無月ルナ', image: 'luna.png', description: 'クーデレお姉さん、Dカップ', shakeMultiplier: 1.2 },
+        };
+
+        function selectCharacter(character) {
+            selectedCharacter = characters[character];
+            document.getElementById('characterSelection').style.display = 'none';
+            document.getElementById('characterDetails').classList.remove('hidden');
+            document.getElementById('characterInfo').innerText = selectedCharacter.description;
+            document.getElementById('gameScreen').style.display = 'block';
+            document.getElementById('characterImage').src = selectedCharacter.image;
+            startGame();
+        }
+
+        function startGame() {
+            window.addEventListener("devicemotion", handleMotion, true);
+            score = 0;
+            dokiDokiGauge = 0;
+            shakeAmount = 0;
+            updateScore();
+        }
+
+        function handleMotion(event) {
+            let x = event.accelerationIncludingGravity.x;
+            let y = event.accelerationIncludingGravity.y;
+
+            shakeStrength = Math.sqrt(x * x + y * y);
+            shakeAmount = shakeStrength * selectedCharacter.shakeMultiplier;
+
+            if (shakeAmount > shakeThreshold) {
+                gameOver();
+            } else {
+                dokiDokiGauge += shakeAmount;
+                if (dokiDokiGauge >= 100) {
+                    gameClear();
+                } else {
+                    updateDokiDokiGauge();
+                    updateScore();
+                }
+            }
+        }
+
+        function updateScore() {
+            document.getElementById('score').innerText = 'スコア: ' + score;
+        }
+
+        function updateDokiDokiGauge() {
+            let gaugeWidth = dokiDokiGauge + '%';
+            document.getElementById('dokiDokiGauge').style.width = gaugeWidth;
+        }
+
+        function gameOver() {
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('gameOverScreen').style.display = 'block';
+            document.getElementById('finalScore').innerText = '最終スコア: ' + score;
+        }
+
+        function gameClear() {
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('gameClearScreen').style.display = 'block';
+        }
+
+        function restartGame() {
+            document.getElementById('gameOverScreen').style.display = 'none';
+            document.getElementById('gameClearScreen').style.display = 'none';
+            document.getElementById('characterSelection').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
