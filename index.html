@@ -71,15 +71,15 @@
         <h2>キャラクターを選んでください</h2>
         <div class="character-selection">
             <div class="character" onclick="selectCharacter('Reina')">
-                <img src="https://via.placeholder.com/200x400.png?text=%E9%9C%A7%E5%B3%B6%E3%83%AC%E3%82%A4%E3%83%8A" alt="霧島レイナ">
+                <img src="reina.png?text=%E9%9C%A7%E5%B3%B6%E3%83%AC%E3%82%A4%E3%83%8A" alt="霧島レイナ">
                 <p>霧島レイナ</p>
             </div>
             <div class="character" onclick="selectCharacter('Hinata')">
-                <img src="https://via.placeholder.com/200x400.png?text=%E6%A9%98%E3%81%B2%E3%81%AA%E3%81%9F" alt="橘ひなた">
+                <img src="hinata.png?text=%E6%A9%98%E3%81%B2%E3%81%AA%E3%81%9F" alt="橘ひなた">
                 <p>橘ひなた</p>
             </div>
             <div class="character" onclick="selectCharacter('Luna')">
-                <img src="https://via.placeholder.com/200x400.png?text=%E6%B0%B4%E5%86%AC%E6%9C%88%E3%83%AB%E3%83%8A" alt="水無月ルナ">
+                <img src="lina.png?text=%E6%B0%B4%E5%86%AC%E6%9C%88%E3%83%AB%E3%83%8A" alt="水無月ルナ">
                 <p>水無月ルナ</p>
             </div>
         </div>
@@ -116,9 +116,9 @@
         let shakeStrength = 0;
 
         const characters = {
-            Reina: { name: '霧島レイナ', image: 'https://via.placeholder.com/300x500.png?text=Reina', description: 'ツンデレお嬢様、Eカップ', shakeMultiplier: 1 },
-            Hinata: { name: '橘ひなた', image: 'https://via.placeholder.com/300x500.png?text=Hinata', description: '甘えん坊ギャル、Gカップ', shakeMultiplier: 1.5 },
-            Luna: { name: '水無月ルナ', image: 'https://via.placeholder.com/300x500.png?text=Luna', description: 'クーデレお姉さん、Dカップ', shakeMultiplier: 1.2 },
+            Reina: { name: '霧島レイナ', image: 'reina.png?text=Reina', description: 'ツンデレお嬢様、Eカップ', shakeMultiplier: 1 },
+            Hinata: { name: '橘ひなた', image: 'hinata.png?text=Hinata', description: '甘えん坊ギャル、Gカップ', shakeMultiplier: 1.5 },
+            Luna: { name: '水無月ルナ', image: 'lina.png?text=Luna', description: 'クーデレお姉さん、Dカップ', shakeMultiplier: 1.2 },
         };
 
         function selectCharacter(character) {
