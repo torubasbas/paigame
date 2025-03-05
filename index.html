@@ -64,6 +64,13 @@
         button:hover {
             background-color: #ff3399;
         }
+        .shaking {
+            animation: shake 0.5s infinite alternate;
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(5px); }
+        }
     </style>
 </head>
 <body>
@@ -136,50 +143,50 @@
             score = 0;
         }
 
-        let startX = 0;
-        let startY = 0;
-
-        document.addEventListener("touchstart", function(event) {
+        document.getElementById('characterImage').addEventListener('touchstart', function(event) {
             if (!gameStarted) return;
 
             let touch = event.touches[0];
-            startX = touch.clientX;
-            startY = touch.clientY;
-        });
-
-        document.addEventListener("touchmove", function(event) {
-            if (!gameStarted) return;
-
-            let touch = event.touches[0];
-            let moveX = touch.clientX;
-            let moveY = touch.clientY;
+            let touchX = touch.clientX;
+            let touchY = touch.clientY;
 
             // キャラクターの胸の位置の周辺でのみ反応
             let chest = selectedCharacter.chestPos;
-            if (moveX > chest.left && moveX < chest.left + chest.width &&
-                moveY > chest.top && moveY < chest.top + chest.height) {
-                let deltaX = moveX - startX;
-                let deltaY = moveY - startY;
-
-                // スライド量に応じてゲージが進行
-                let slideAmount = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                dokiDokiGauge += slideAmount / 10; // スライドの距離に応じてゲージが進む
-
-                // ゲージが100%を超えた場合はゲームオーバー
-                if (dokiDokiGauge >= 100) {
-                    dokiDokiGauge = 100;
-                    gameOver();
-                }
-
-                // ゲージが90%以上でクリア
-                if (dokiDokiGauge >= 90) {
-                    gameClear();
-                }
-
-                // ゲージを更新
-                document.getElementById('dokiDokiGauge').style.width = dokiDokiGauge + '%';
+            if (touchX > chest.left && touchX < chest.left + chest.width &&
+                touchY > chest.top && touchY < chest.top + chest.height) {
+                // 長押し開始
+                isPressing = true;
+                startLongPress();
+                document.getElementById('characterImage').classList.add('shaking');
             }
         });
+
+        document.getElementById('characterImage').addEventListener('touchend', function() {
+            if (isPressing) {
+                isPressing = false;
+                clearLongPress();
+                document.getElementById('characterImage').classList.remove('shaking');
+            }
+        });
+
+        function startLongPress() {
+            longPressTimer = setInterval(function() {
+                if (isPressing) {
+                    dokiDokiGauge += 1;
+                    document.getElementById('dokiDokiGauge').style.width = dokiDokiGauge + '%';
+                    if (dokiDokiGauge >= 100) {
+                        dokiDokiGauge = 100;
+                        gameOver();
+                    } else if (dokiDokiGauge >= 90) {
+                        gameClear();
+                    }
+                }
+            }, 100); // 100msごとにゲージを増加
+        }
+
+        function clearLongPress() {
+            clearInterval(longPressTimer);
+        }
 
         function gameOver() {
             document.getElementById('gameScreen').style.display = 'none';
