@@ -132,7 +132,12 @@
         }
 
         function startGame() {
-            window.addEventListener("devicemotion", handleMotion, true);
+            // 加速度センサーの許可を求める
+            if (window.DeviceMotionEvent) {
+                window.addEventListener("devicemotion", handleMotion, true);
+            } else {
+                alert("このデバイスでは加速度センサーがサポートされていません");
+            }
             score = 0;
             dokiDokiGauge = 0;
             shakeAmount = 0;
