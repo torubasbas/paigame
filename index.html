@@ -110,15 +110,13 @@
     <script>
         let selectedCharacter = null;
         let score = 0;
-        let shakeAmount = 0;
         let dokiDokiGauge = 0;
-        let shakeThreshold = 12;
-        let shakeStrength = 0;
+        let gameStarted = false;
 
         const characters = {
-            Reina: { name: '霧島レイナ', image: 'reina.png?text=Reina', description: 'ツンデレお嬢様、Eカップ', shakeMultiplier: 1 },
-            Hinata: { name: '橘ひなた', image: 'hinata.png?text=Hinata', description: '甘えん坊ギャル、Gカップ', shakeMultiplier: 1.5 },
-            Luna: { name: '水無月ルナ', image: 'lina.png?text=Luna', description: 'クーデレお姉さん、Dカップ', shakeMultiplier: 1.2 },
+            Reina: { name: '霧島レイナ', image: 'reina.png?text=Reina', description: 'ツンデレお嬢様、Eカップ', chestPos: { top: 200, left: 100, width: 100, height: 200 } },
+            Hinata: { name: '橘ひなた', image: 'hinata.png?text=Hinata', description: '甘えん坊ギャル、Gカップ', chestPos: { top: 180, left: 110, width: 120, height: 220 } },
+            Luna: { name: '水無月ルナ', image: 'lina.png?text=Luna', description: 'クーデレお姉さん、Dカップ', chestPos: { top: 210, left: 120, width: 110, height: 210 } },
         };
 
         function selectCharacter(character) {
@@ -128,53 +126,60 @@
             document.getElementById('characterInfo').innerText = selectedCharacter.description;
             document.getElementById('gameScreen').style.display = 'block';
             document.getElementById('characterImage').src = selectedCharacter.image;
+            gameStarted = true;
             startGame();
         }
 
         function startGame() {
-            // 加速度センサーの許可を求める
-            if (window.DeviceMotionEvent) {
-                window.addEventListener("devicemotion", handleMotion, true);
-            } else {
-                alert("このデバイスでは加速度センサーがサポートされていません");
-            }
-            score = 0;
+            document.getElementById('dokiDokiGauge').style.width = '0%';
             dokiDokiGauge = 0;
-            shakeAmount = 0;
-            updateScore();
+            score = 0;
         }
 
-        function handleMotion(event) {
-            let x = event.accelerationIncludingGravity.x;
-            let y = event.accelerationIncludingGravity.y;
+        let startX = 0;
+        let startY = 0;
 
-            // デバイスの傾きをコンソールに表示
-            console.log(`X: ${x}, Y: ${y}`);
+        document.addEventListener("touchstart", function(event) {
+            if (!gameStarted) return;
 
-            shakeStrength = Math.sqrt(x * x + y * y);
-            shakeAmount = shakeStrength * selectedCharacter.shakeMultiplier;
+            let touch = event.touches[0];
+            startX = touch.clientX;
+            startY = touch.clientY;
+        });
 
-            if (shakeAmount > shakeThreshold) {
-                gameOver();
-            } else {
-                dokiDokiGauge += shakeAmount;
+        document.addEventListener("touchmove", function(event) {
+            if (!gameStarted) return;
+
+            let touch = event.touches[0];
+            let moveX = touch.clientX;
+            let moveY = touch.clientY;
+
+            // キャラクターの胸の位置の周辺でのみ反応
+            let chest = selectedCharacter.chestPos;
+            if (moveX > chest.left && moveX < chest.left + chest.width &&
+                moveY > chest.top && moveY < chest.top + chest.height) {
+                let deltaX = moveX - startX;
+                let deltaY = moveY - startY;
+
+                // スライド量に応じてゲージが進行
+                let slideAmount = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                dokiDokiGauge += slideAmount / 10; // スライドの距離に応じてゲージが進む
+
+                // ゲージが100%を超えた場合はゲームオーバー
                 if (dokiDokiGauge >= 100) {
-                    gameClear();
-                } else {
-                    updateDokiDokiGauge();
-                    updateScore();
+                    dokiDokiGauge = 100;
+                    gameOver();
                 }
+
+                // ゲージが90%以上でクリア
+                if (dokiDokiGauge >= 90) {
+                    gameClear();
+                }
+
+                // ゲージを更新
+                document.getElementById('dokiDokiGauge').style.width = dokiDokiGauge + '%';
             }
-        }
-
-        function updateScore() {
-            document.getElementById('score').innerText = 'スコア: ' + score;
-        }
-
-        function updateDokiDokiGauge() {
-            let gaugeWidth = dokiDokiGauge + '%';
-            document.getElementById('dokiDokiGauge').style.width = gaugeWidth;
-        }
+        });
 
         function gameOver() {
             document.getElementById('gameScreen').style.display = 'none';
