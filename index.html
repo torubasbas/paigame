@@ -143,6 +143,9 @@
             let x = event.accelerationIncludingGravity.x;
             let y = event.accelerationIncludingGravity.y;
 
+            // デバイスの傾きをコンソールに表示
+            console.log(`X: ${x}, Y: ${y}`);
+
             shakeStrength = Math.sqrt(x * x + y * y);
             shakeAmount = shakeStrength * selectedCharacter.shakeMultiplier;
 
